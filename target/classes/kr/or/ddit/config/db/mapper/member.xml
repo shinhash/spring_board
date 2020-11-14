@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="member">
+
+
+  <select id="selectAllMember" resultType="MemberVO">
+  	
+  	SELECT * 
+  	FROM users
+  	
+  </select>
+
+
+
+
+  <select id="selectMember" parameterType="String" resultType="MemberVO">
+  
+    SELECT * 
+    FROM users 
+    WHERE USERID = #{userid}
+    
+  </select>
+  
+  
+  <select id="selectMemberPage" parameterType="PageVO" resultType="MemberVO">
+  	
+  	SELECT USERINFO_B.*
+	FROM(
+	    SELECT ROWNUM AS RN, USERINFO_A.*
+	    FROM (
+	            SELECT *
+	            FROM USERS
+	            ORDER BY USERID
+	          )USERINFO_A
+	     )USERINFO_B
+	WHERE RN between ((#{pageNum} - 1) * #{pageSize} + 1) AND (#{pageNum} * #{pageSize})
+	
+  </select>
+  
+  
+  
+  <select id="selectMemberTotalCnt" resultType="int">
+  
+  	SELECT COUNT(*)
+  	FROM USERS
+  	
+  </select>
+  
+  
+  <insert id="insertMember" parameterType="MemberVO">
+  
+  	INSERT INTO USERS VALUES(#{userid}, #{usernm}, #{pass}, SYSDATE, #{alias}, #{addr1}, #{addr2}, #{zipcode}, #{filename}, #{realfilename})
+  	
+  </insert>
+  
+  
+  
+  <update id="updateMember" parameterType="MemberVO">
+  
+  	UPDATE USERS
+  	SET
+  	usernm = #{usernm},
+  	pass = #{pass},
+  	reg_dt = SYSDATE,
+  	alias = #{alias},
+  	addr1 = #{addr1},
+  	addr2 = #{addr2},
+  	zipcode = #{zipcode},
+  	filename = #{filename},
+  	realfilename = #{realfilename}
+  	
+  	WHERE userid = #{userid}
+  	
+  </update>
+  
+  
+  
+</mapper>

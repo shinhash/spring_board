@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  
+<mapper namespace="board">
+  
+  
+  <insert id="insertBoardKind" parameterType="BoardKindVO">
+  
+  	INSERT INTO BOARD_KIND(BOARD_KIND_ID, 
+							BOARD_KIND_TITLE, 
+							BOARD_KIND_STATUS, 
+							BOARD_KIND_CREATOR, 
+							BOARD_KIND_DT) 
+				VALUES(BK_SEQ.NEXTVAL, #{BOARD_KIND_TITLE}, #{BOARD_KIND_STATUS}, #{BOARD_KIND_CREATOR}, SYSDATE)
+<!-- 				VALUES(#{BOARD_KIND_ID}, #{BOARD_KIND_TITLE}, #{BOARD_KIND_STATUS}, #{BOARD_KIND_CREATOR}, SYSDATE) -->
+				
+  </insert>
+  
+  <select id="selectAllBoardKind" resultType="BoardKindVO">
+  
+  	SELECT * 
+  	FROM BOARD_KIND
+  	WHERE BOARD_KIND_STATUS = 'Y'
+  	ORDER BY BOARD_KIND_ID
+  	
+  </select>
+  
+  
+  
+  <select id="selectAddedBoardKind" parameterType="String" resultType="BoardKindVO">
+  
+  	SELECT * 
+  	FROM BOARD_KIND
+  	WHERE BOARD_KIND_CREATOR = #{USERID}
+  	ORDER BY BOARD_KIND_ID
+  	
+  </select>
+  
+  
+  
+  <select id="selectBoardKindTitle" parameterType="int" resultType="String">
+  
+  	SELECT BOARD_KIND_TITLE
+  	FROM BOARD_KIND 
+  	WHERE BOARD_KIND_ID = #{boardKindId}
+  	
+  </select>
+  
+  
+  
+  
+  
+  <select id="selectBoardPageList" parameterType="PageVO" resultType="BoardVO">
+  	
+  	SELECT BOARD_B.BOARD_SEQ,
+	       BOARD_B.BOARD_TITLE,
+	       BOARD_B.BOARD_CONTENT,
+	       BOARD_B.BOARD_PSEQ,
+	       BOARD_B.BOARD_GN,
+	       BOARD_B.USERID,
+	       BOARD_B.BOARD_DATE,
+	       BOARD_B.BOARD_KIND_ID,
+	       BOARD_B.BOARD_STATUS, 
+	       BOARD_B.rn as BOARD_RN
+	FROM(
+	        SELECT ROWNUM AS rn, BOARD_A.*
+	        FROM (
+	                    SELECT *
+	                    FROM (
+	                            select BOARD_SEQ, 
+	                                   LPAD('  ┗─', (LEVEL-1)*4) || BOARD_TITLE AS BOARD_TITLE, 
+	                                   BOARD_CONTENT, 
+	                                   BOARD_PSEQ, 
+	                                   BOARD_GN, 
+	                                   USERID, 
+	                                   BOARD_DATE, 
+	                                   BOARD_KIND_ID, 
+	                                   BOARD_STATUS
+	                                          
+	                            from BOARD_TABLE
+	                            start with BOARD_PSEQ is null
+	                            connect by BOARD_PSEQ = prior BOARD_SEQ
+	                            order siblings by BOARD_GN desc, BOARD_SEQ asc
+	                        )
+	                    WHERE BOARD_KIND_ID = #{boardKindId}
+	              )BOARD_A
+	    )BOARD_B
+	WHERE rn BETWEEN (#{pageNum} - 1 ) * #{pageSize} + 1 AND #{pageNum} * #{pageSize}
+	
+  </select>
+  
+  
+  
+  <select id="selectBoardTotal" parameterType="int" resultType="int">
+  	
+  	SELECT COUNT(*) 
+  	FROM BOARD_TABLE
+  	WHERE 1 = 1 
+  	AND BOARD_KIND_ID = #{BOARD_KIND_ID}
+  	AND BOARD_STATUS = 'Y'
+  	
+  </select>
+  
+  
+  
+  <update id="updateBoardKind" parameterType="BoardKindVO">
+  
+  	UPDATE BOARD_KIND
+  	SET 
+  	BOARD_KIND_STATUS = #{BOARD_KIND_STATUS}, 
+  	BOARD_KIND_DT = SYSDATE
+  	WHERE BOARD_KIND_ID = #{BOARD_KIND_ID}
+  	
+  </update>
+  
+  
+  
+  <select id="selectBoardInfo" parameterType="int" resultType="BoardVO">
+  
+  	SELECT * 
+  	FROM BOARD_TABLE 
+  	WHERE BOARD_SEQ = #{boardSeq}
+  	
+  </select>
+  
+  
+  
+  <select id="selectBoardGnVO" parameterType="int" resultType="BoardVO">
+  
+  	SELECT * 
+  	FROM BOARD_TABLE 
+  	WHERE BOARD_SEQ = #{boardPseqNum}
+  
+  </select>
+  
+  
+
+	
+	<parameterMap type="BoardVO" id="ClobBoardVO">
+	
+		<parameter property="BOARD_SEQ" javaType="int"/>
+		<parameter property="BOARD_TITLE" javaType="String"/>
+		<parameter property="BOARD_CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
+		<parameter property="BOARD_PSEQ" javaType="int"/>
+		<parameter property="BOARD_GN" javaType="int"/>
+		<parameter property="USERID" javaType="String"/>
+		<parameter property="BOARD_DATE" javaType="Date"/>
+		<parameter property="BOARD_KIND_ID" javaType="int"/>
+		<parameter property="BOARD_STATUS" javaType="String"/>
+		
+	</parameterMap>
+  
+  
+  
+  
+  <select id="selectBoardSeq" resultType="int">
+	
+	SELECT B_SEQ.NEXTVAL
+	FROM DUAL
+  
+  </select>
+  
+  <insert id="insertNewBoard" parameterType="BoardVO">
+  
+  
+  	<choose>
+  		<when test="BOARD_PSEQ != 0">
+  		
+  			INSERT INTO BOARD_TABLE(BOARD_SEQ, 
+								BOARD_TITLE, 
+								BOARD_CONTENT, 
+								BOARD_PSEQ, 
+								BOARD_GN, 
+								USERID, 
+								BOARD_DATE, 
+								BOARD_KIND_ID, 
+								BOARD_STATUS)
+  				VALUES(#{BOARD_SEQ}, 
+  					   #{BOARD_TITLE}, 
+  					   EMPTY_CLOB(), 
+  					   #{BOARD_PSEQ}, 
+  					   #{BOARD_GN}, 
+  					   #{USERID}, 
+  					   SYSDATE, 
+  					   #{BOARD_KIND_ID}, 
+  					   #{BOARD_STATUS})
+  					   
+  		</when>
+  		
+  		<otherwise>
+  			
+  			INSERT INTO BOARD_TABLE(BOARD_SEQ, 
+								BOARD_TITLE, 
+								BOARD_CONTENT, 
+								BOARD_GN, 
+								USERID, 
+								BOARD_DATE, 
+								BOARD_KIND_ID, 
+								BOARD_STATUS)
+  				VALUES(#{BOARD_SEQ}, 
+  					   #{BOARD_TITLE}, 
+  					   EMPTY_CLOB(), 
+  					   GN_SEQ.NEXTVAL, 
+  					   #{USERID}, 
+  					   SYSDATE, 
+  					   #{BOARD_KIND_ID}, 
+  					   #{BOARD_STATUS})
+  			
+  		</otherwise>
+  	</choose>
+  					   
+  </insert>
+  
+  <update id="updateNewInsertFile" parameterMap="ClobBoardVO">
+  
+  	UPDATE BOARD_TABLE
+  	SET
+  	BOARD_CONTENT = #{BOARD_CONTENT,jdbcType=CLOB}
+  	WHERE BOARD_SEQ = #{BOARD_SEQ}
+  	
+  </update>
+  
+  
+  <select id="selectFileSeq" resultType="int">
+  	
+  	SELECT F_SEQ.NEXTVAL
+  	FROM DUAL
+  	
+  </select>
+  
+  
+  <insert id="insertBoardFile" parameterType="FileVO">
+  
+  	INSERT INTO FILE_TABLE(FILE_SEQ, 
+						   FILE_NAME, 
+						   REAL_FILE_NAME, 
+						   BOARD_KIND_ID, 
+						   BOARD_SEQ, 
+						   FILE_STATUS)
+  				VALUES(#{FILE_SEQ}, 
+					   #{FILE_NAME}, 
+					   #{REAL_FILE_NAME}, 
+					   #{BOARD_KIND_ID}, 
+					   #{BOARD_SEQ}, 
+					   #{FILE_STATUS})
+  					   
+  </insert>
+  
+  
+  <select id="selectFileList" parameterType="int" resultType="FileVO">
+  
+  	SELECT *
+	FROM FILE_TABLE
+	WHERE BOARD_SEQ = #{boardSeq}
+	AND FILE_STATUS = 'Y'
+	
+  </select>
+  
+  
+  <update id="updateBoardInfo" parameterMap="ClobBoardVO">
+  
+  	UPDATE BOARD_TABLE
+  	SET
+  	BOARD_TITLE = #{BOARD_TITLE}, 
+	BOARD_CONTENT = #{BOARD_CONTENT,jdbcType=CLOB}, 
+  	BOARD_DATE = SYSDATE
+  	WHERE 1 = 1
+  	AND BOARD_SEQ = #{BOARD_SEQ}
+  	AND BOARD_KIND_ID = #{BOARD_KIND_ID}
+  	
+  </update>
+  
+  
+  
+  <update id="updateFileInfo">
+  
+  	UPDATE FILE_TABLE
+  	SET
+  	FILE_STATUS = #{FILE_STATUS}
+  	WHERE FILE_SEQ = #{FILE_SEQ}
+  
+  </update>
+  
+  
+  
+  <update id="delBoardStatus" parameterMap="ClobBoardVO">
+  
+  	UPDATE BOARD_TABLE
+  	SET
+  	BOARD_STATUS = #{BOARD_STATUS}, 
+  	BOARD_TITLE = #{BOARD_TITLE}, 
+  	BOARD_DATE = SYSDATE
+  	WHERE BOARD_SEQ = #{BOARD_SEQ}
+  	
+  </update>
+  
+  
+  
+  
+  
+  
+</mapper>

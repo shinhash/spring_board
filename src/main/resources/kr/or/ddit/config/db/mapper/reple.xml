@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  
+<mapper namespace="reple">
+  
+  
+  <select id="selectRepleList" parameterType="BoardVO" resultType="RepleVO">
+  
+    SELECT * 
+    FROM REPLE_TABLE 
+    WHERE 1 = 1
+    AND BOARD_KIND_ID = #{BOARD_KIND_ID}
+    AND BOARD_SEQ = #{BOARD_SEQ}
+    ORDER BY REPLE_DT DESC
+    
+  </select>
+  
+  
+  
+  <insert id="insertReple" parameterType="RepleVO">
+  
+  	INSERT INTO REPLE_TABLE(BOARD_SEQ, 
+							REPLE_SEQ, 
+							REPLE_CONTENT, 
+							REPLE_DT, 
+							BOARD_KIND_ID, 
+							REPLE_STATUS, 
+							USERID) 
+				VALUES(#{BOARD_SEQ}, 
+					   R_SEQ.NEXTVAL, 
+					   #{REPLE_CONTENT}, 
+					   SYSDATE, 
+					   #{BOARD_KIND_ID}, 
+					   #{REPLE_STATUS}, 
+					   #{USERID})
+  
+  </insert>
+  
+  
+  
+  <update id="deleteReple" parameterType="RepleVO">
+  
+  	UPDATE REPLE_TABLE 
+  	SET
+  	REPLE_CONTENT = #{REPLE_CONTENT}, 
+  	REPLE_STATUS = #{REPLE_STATUS}
+  	WHERE REPLE_SEQ = #{REPLE_SEQ}
+
+  </update>
+  
+  
+  <select id="selectRepBoardId" parameterType="int" resultType="int">
+  
+  	SELECT BOARD_SEQ
+  	FROM REPLE_TABLE
+  	WHERE REPLE_SEQ = #{repleId}
+  
+  </select>
+  
+  
+  
+</mapper>
