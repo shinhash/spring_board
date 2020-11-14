@@ -491,6 +491,7 @@ public class BoardController {
 	
 	
 	
+	
 	/*
 		protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
