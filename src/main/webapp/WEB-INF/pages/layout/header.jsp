@@ -18,10 +18,10 @@
 			
 			<c:choose>
 				<c:when test="${MEMBER == null}">
-					<a class="navbar-brand" href="${cp }/pages/main/main.jsp">MY BOARD</a>
+					<a class="navbar-brand" href="${cp }/board/main">MY BOARD</a>
 				</c:when>
 				<c:otherwise>
-					<a class="navbar-brand" href="${cp }/pages/main/main.jsp">MY BOARD [ ${MEMBER.userid} ]</a>
+					<a class="navbar-brand" href="${cp }/board/main">MY BOARD [ ${MEMBER.userid} ]</a>
 				</c:otherwise>
 			</c:choose>
 			

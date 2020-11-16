@@ -55,6 +55,16 @@ public class BoardController {
 	
 	
 	
+	
+	@RequestMapping("/main")
+	public String mainPage() {
+		return "tiles/layout/main_content";
+	}
+	
+	
+	
+	
+	
 	/**
 	 * 회원이 생성한 게시판 목록을 보여주는 메서드
 	 */
@@ -101,10 +111,10 @@ public class BoardController {
 	 * 회원이 생성한 게시판의 속성을 변경하는 메서드
 	 */
 	@RequestMapping("/boardKindUpdate")
-	public String boardKindUpdateAction(HttpSession session, int upBoardKindId, String boardUse) {
+	public String boardKindUpdateAction(HttpSession session, String upBoardKindId, String boardUse) {
 		
 		BoardKindVO bkVO = new BoardKindVO();
-		bkVO.setBOARD_KIND_ID(upBoardKindId);
+		bkVO.setBOARD_KIND_ID(Integer.parseInt(upBoardKindId));
 		bkVO.setBOARD_KIND_STATUS(boardUse);
 		
 		int updateCnt = boardService.updateBoardKind(bkVO);
@@ -129,13 +139,13 @@ public class BoardController {
 	 */
 	@RequestMapping("/boardList")
 	public String boardListView(Model model,
-								int boardKindId,
+								String boardKindId,
 								@RequestParam(name = "pageNum", defaultValue = "1") String pageNumStr) {
 		
 		int pageNum = Integer.parseInt(pageNumStr);
 		int pageSize = 10;
 		
-		Map<String, Object> boardInfoMap = boardService.selectBoardPageList(boardKindId, pageNum, pageSize);
+		Map<String, Object> boardInfoMap = boardService.selectBoardPageList(Integer.parseInt(boardKindId), pageNum, pageSize);
 		
 		int pageCnt = (Integer) boardInfoMap.get("pageCnt");
 		List<BoardVO> boardPageList = (List<BoardVO>) boardInfoMap.get("boardList");
@@ -190,7 +200,9 @@ public class BoardController {
 	
 	
 	
-	
+	/**
+	 * 게시글 작성 페이지 이동 메서드
+	 */
 	@RequestMapping("/registView")
 	public String boardRegistView(String boardPseq, int boardKindId, Model model) {
 		
@@ -217,7 +229,9 @@ public class BoardController {
 	
 	
 	
-	
+	/**
+	 * 작성한 게시글 등록 메서드
+	 */
 	@RequestMapping(path="/registAction", method = RequestMethod.POST)
 	public String registAction(HttpSession session, 
 							   String boardTitle, 
@@ -343,6 +357,10 @@ public class BoardController {
 	
 	
 	
+	
+	/**
+	 * 게시글 수정 페이지 이동 메서드
+	 */
 	@RequestMapping("/boardUpdateView")
 	public String boardupdateView(int boardSeq, Model model) {
 		
@@ -370,7 +388,9 @@ public class BoardController {
 	
 	
 	
-	
+	/**
+	 * 게시글 수정 등록 메서드
+	 */
 	@RequestMapping(path="/boardUpdateAction", method = RequestMethod.POST)
 	public String boardUpdateAction(HttpSession session, 
 								    int BOARD_SEQ, 
@@ -462,9 +482,6 @@ public class BoardController {
 		}
 		
 		
-//		logger.debug("insertFileList size : {}", insertFileList.size());
-		
-		
 		Map<String, Object> updateInfoMap = new HashMap<String, Object>();
 		updateInfoMap.put("boardVO", boardVO);
 		updateInfoMap.put("fileIdList", fileIdList);
@@ -489,7 +506,9 @@ public class BoardController {
 	
 	
 	
-	
+	/**
+	 * 게시글 삭제 메서드
+	 */
 	@RequestMapping("/boardDelete")
 	public String boardDelete(int boardSeq, int boardKindId) {
 		
