@@ -228,6 +228,7 @@ public class BoardController {
 							   ) throws IllegalStateException, IOException {
 		
 		
+		
 		MemberVO memVO = (MemberVO) session.getAttribute("MEMBER");
 		
 		
