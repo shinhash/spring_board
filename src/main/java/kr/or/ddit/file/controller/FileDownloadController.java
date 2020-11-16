@@ -27,6 +27,4 @@ public class FileDownloadController {
 		return "attchFileDownload";
 	}
 	
-	
-	
 }
