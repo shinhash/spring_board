@@ -42,7 +42,7 @@
 	<script type="text/javascript">
 
 		$(function(){
-
+			inputfilelimitCnt = 5;			// 파일추가 가능한 수 
 			tagId = 0;
 			var summer = $("#summernote");
 			$('#summernote').summernote({
@@ -68,9 +68,17 @@
 				$("#div" + tagId).remove()
 			});
 			$("#attachAdd").on("click", function(){
-				tagId++;
-				tagInfo = "<div id='div"+tagId+"' class='attchFile'><input type='file' name='file' style='float:left;'><button type='button' id='"+tagId+"' class='btn btn-primary delBtn'> X </button></input></div>";
-				$("#addedFileDiv").append(tagInfo); // 태그 추가
+
+				if(parseInt(${fileList.size() }) + parseInt(tagId) >= inputfilelimitCnt){
+					alert("파일은 한번에 5개까지만 등록됩니다.")
+				}else{
+					tagId++;
+					tagInfo = "<div id='div"+tagId+"' class='attchFile'><input type='file' name='file' style='float:left;'><button type='button' id='"+tagId+"' class='btn btn-primary delBtn'> X </button></input></div>";
+					$("#addedFileDiv").append(tagInfo); // 태그 추가
+				}
+
+				
+				
 			});
 			$(document).on("click", ".delFileBtn", function(){
 				

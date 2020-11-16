@@ -61,7 +61,7 @@
 			<div class="col-sm-9 col-sm-offset-2 col-md-10 col-md-offset-0 main">
 				<br>
 				<div class="row">
-					<div class="col-sm-8 blog-main">
+					<div class="col-sm-10 blog-main">
 						<h2 class="sub-header">${boardKindTitle }</h2>
 						
 						

@@ -228,6 +228,12 @@ public class BoardController {
 							   ) throws IllegalStateException, IOException {
 		
 		
+		for(MultipartFile file : fileList) {
+			logger.debug("file : {}", file.getOriginalFilename());
+		}
+		
+		
+		
 		
 		MemberVO memVO = (MemberVO) session.getAttribute("MEMBER");
 		
@@ -348,8 +354,12 @@ public class BoardController {
 		
 		if(fileList != null && fileList.size() > 0) {
 			model.addAttribute("fileList", fileList);			
+			model.addAttribute("boardVO", boardVO);
+		}else {
+			fileList = new ArrayList<FileVO>();
+			model.addAttribute("fileList", fileList);
+			model.addAttribute("boardVO", boardVO);
 		}
-		model.addAttribute("boardVO", boardVO);
 		
 		return "tiles/board/boardUpdate";
 	}
@@ -361,17 +371,23 @@ public class BoardController {
 	
 	
 	
-	@RequestMapping("/boardUpdateAction")
+	@RequestMapping(path="/boardUpdateAction", method = RequestMethod.POST)
 	public String boardUpdateAction(HttpSession session, 
 								    int BOARD_SEQ, 
 								    String boardTitleName, 
 								    String editordata, 
 								    int BOARD_KIND_ID,
 								    @RequestParam(name = "delFileIdInfo", required = false) String[] delFileIdInfo,
-								    @RequestPart("file") List<MultipartFile> fileList) throws IllegalStateException, IOException {
+								    @RequestPart(name = "file", required = false) List<MultipartFile> fileList) throws IllegalStateException, IOException {
 		
 		
 		MemberVO memVO = (MemberVO) session.getAttribute("MEMBER");
+		
+		
+		
+		logger.debug("delFileIdInfo : {}", (Object) delFileIdInfo);
+		logger.debug("fileList : {}", (Object) fileList);
+		
 		
 		
 		BoardVO boardVO = new BoardVO();
@@ -388,7 +404,7 @@ public class BoardController {
 		// board update
 		// 파일 리스트에서 삭제한것이 있는지 확인
 		List<Integer> fileIdList = null;
-		if(delFileIdInfo != null && delFileIdInfo.length > 0) {
+		if(delFileIdInfo != null) {
 			fileIdList = new ArrayList<Integer>();
 			for(String fileInfoId : delFileIdInfo) {
 				int delFileId = Integer.parseInt(fileInfoId);
@@ -403,13 +419,13 @@ public class BoardController {
 		
 		
 		if(fileList.size() > 0) {
+			insertFileList = new ArrayList<FileVO>();
 			
 			for(MultipartFile file : fileList) {
 				
 				if(!file.getOriginalFilename().equals("")) {
 					logger.debug("fileName : {}", file.getOriginalFilename());
 					
-					insertFileList = new ArrayList<FileVO>();
 					
 					// 파일의 진짜 이름(이름 + 확장자)
 					String fileRealName = file.getOriginalFilename();
@@ -439,14 +455,22 @@ public class BoardController {
 					insertFileVO.setFILE_STATUS("Y");
 					
 					insertFileList.add(insertFileVO);
+					
+					logger.debug("insertFileVO : {}", insertFileVO);
 				}
 			}
 		}
+		
+		
+//		logger.debug("insertFileList size : {}", insertFileList.size());
+		
 		
 		Map<String, Object> updateInfoMap = new HashMap<String, Object>();
 		updateInfoMap.put("boardVO", boardVO);
 		updateInfoMap.put("fileIdList", fileIdList);
 		updateInfoMap.put("insertFileList", insertFileList);
+		
+		
 		
 		int updateBoardCnt = boardService.updateBoardInfo(updateInfoMap);
 		if(updateBoardCnt == 1) {

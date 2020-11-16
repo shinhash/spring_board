@@ -112,12 +112,7 @@ public class BoardDao implements BoardDaoI {
 	
 	@Override
 	public int insertBoardFile(FileVO fileVO) {
-		
-		int fileSeq = sqlSession.selectOne("board.selectFileSeq");
-		fileVO.setFILE_SEQ(fileSeq);
-		int insertBoardFileCnt = sqlSession.insert("board.insertBoardFile", fileVO);			
-		
-		return insertBoardFileCnt;
+		return sqlSession.insert("board.insertBoardFile", fileVO);	
 	}
 
 
@@ -154,6 +149,12 @@ public class BoardDao implements BoardDaoI {
 	@Override
 	public int delBoardStatus(BoardVO boardVO) {
 		return sqlSession.update("board.delBoardStatus", boardVO);
+	}
+
+
+	@Override
+	public int selectFileSeq() {
+		return sqlSession.selectOne("board.selectFileSeq");
 	}
 
 

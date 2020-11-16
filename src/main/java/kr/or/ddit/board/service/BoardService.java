@@ -122,6 +122,7 @@ public class BoardService implements BoardServiceI {
 
 	@Override
 	public int insertBoardFile(FileVO fileVO) {
+		fileVO.setFILE_SEQ(boardDao.selectFileSeq());
 		return boardDao.insertBoardFile(fileVO);
 	}
 
@@ -168,19 +169,22 @@ public class BoardService implements BoardServiceI {
 			
 			// 파일 추가
 			if(insertFileList != null) {
+				logger.debug("insertFileList length : {}", insertFileList.size());
 				for(FileVO insertFile : insertFileList) {
-					int fileSeq = selectBoardSeq();
+					
+					logger.debug("file name : {}", insertFile.getREAL_FILE_NAME());
+					
+					int fileSeq = boardDao.selectFileSeq();
 					insertFile.setFILE_SEQ(fileSeq);
 					insertFileInfoCnt = boardDao.updateInsertFileInfo(insertFile);
+					
+					logger.debug("file insert 완료");
 				}
 			}else {
 				insertFileList = new ArrayList<FileVO>();
 			}
 		}
 		
-//		if(updateFileInfoCnt == 1 && insertFileInfoCnt == 1) {
-//			updateResult = 1;
-//		}
 		
 		return updateBoardCnt;
 	}

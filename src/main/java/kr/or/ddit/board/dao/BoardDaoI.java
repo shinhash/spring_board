@@ -45,5 +45,7 @@ public interface BoardDaoI {
 	int updateInsertFileInfo(FileVO insertFile);
 	
 	int delBoardStatus(BoardVO boardVO);
+
+	int selectFileSeq();
 	
 }
