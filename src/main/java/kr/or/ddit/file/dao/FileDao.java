@@ -1,20 +1,24 @@
 package kr.or.ddit.file.dao;
 
-import org.apache.ibatis.session.SqlSession;
+import javax.annotation.Resource;
 
-import kr.or.ddit.db.MybatisUtil;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.springframework.stereotype.Repository;
+
 import kr.or.ddit.file.vo.FileVO;
 
+
+@Repository("fileRepository")
 public class FileDao implements FileDaoI {
 
+	
+	@Resource(name = "sqlSessionTemplate")
+	private SqlSessionTemplate sqlSession;
 	
 	
 	@Override
 	public FileVO selectFileVO(int fileId) {
-		SqlSession sqlSession = MybatisUtil.getSqlSession();
-		FileVO fileVO = sqlSession.selectOne("file.selectFileVO", fileId);
-		sqlSession.close();
-		return fileVO;
+		return sqlSession.selectOne("file.selectFileVO", fileId);
 	}
 
 }

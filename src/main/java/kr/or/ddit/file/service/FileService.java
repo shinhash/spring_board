@@ -1,17 +1,22 @@
 package kr.or.ddit.file.service;
 
-import kr.or.ddit.file.dao.FileDao;
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
 import kr.or.ddit.file.dao.FileDaoI;
 import kr.or.ddit.file.vo.FileVO;
 
+
+
+@Service("fileService")
 public class FileService implements FileServiceI {
 	
-	
+	@Resource(name = "fileRepository")
 	private FileDaoI fileDao;
-	public FileService() {
-		fileDao = new FileDao();
-	}
 
+	
+	
 	@Override
 	public FileVO selectFileVO(int fileId) {
 		return fileDao.selectFileVO(fileId);

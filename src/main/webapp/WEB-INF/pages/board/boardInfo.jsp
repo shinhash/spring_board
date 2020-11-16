@@ -50,7 +50,7 @@
 			$("#deleteBoardInfo").on("click", function(){
 				var boardSeq = $("#boardSeq").val();
 				var boardKindId = $("#boardKindId").val();
-				document.location = "boardDelete?boardSeq=" + boardSeq + "&boardKindId=" + boardKindId;
+				document.location = "/board/boardDelete?boardSeq=" + boardSeq + "&boardKindId=" + boardKindId;
 			})
 
 
@@ -65,7 +65,7 @@
 
 			$(".delRepleBtn").on("click", function(){
 				var repleId = $(this).parents(".showRepleDiv").find(".repleId").val()
-				document.location = "repleDelete?repleId=" + repleId;
+				document.location = "/reple/delete?repleId=" + repleId;
 			})
 
 			$("#commentBoardInfo").on("click", function(){
@@ -74,9 +74,9 @@
 				document.location = "/board/registView?boardPseq=" + boardPseq + "&boardKindId=" + boardKindId;
 			})
 
-			$(".delFileBtn").on("click", function(){
-				var fileId = $(this).parents(".dbFileDiv").find(".delFileId").val();
-				document.location = "fileDownload?fileId=" + fileId;
+			$(".downFileBtn").on("click", function(){
+				var fileId = $(this).parents(".dbFileDiv").find(".downFileId").val();
+				document.location = "/file/download?fileId=" + fileId;
 			})
 
 		})
@@ -113,8 +113,8 @@
 							<c:forEach items="${fileList }" var="file">
 							
 								<div class="dbFileDiv">
-									<input type="hidden" class="delFileId" name="fileId" value="${file.FILE_SEQ }" />
-									${file.REAL_FILE_NAME } <button type="button" class="btn btn-primary delFileBtn">Down</button>
+									<input type="hidden" class="downFileId" name="fileId" value="${file.FILE_SEQ }" />
+									${file.REAL_FILE_NAME } <button type="button" class="btn btn-primary downFileBtn">Down</button>
 								</div>
 								<br>
 								
@@ -201,7 +201,7 @@
 				<br>
 				
 				
-				<form id="repleWriteForm" action="${cp }/repleRegist" method="post">
+				<form id="repleWriteForm" action="${cp }/reple/regist" method="post">
 					<input type="hidden" name="boardSeq" value="${boardVO.BOARD_SEQ }" />
 					<input type="hidden" name="boardKindId" value="${boardVO.BOARD_KIND_ID }"/>
 					<input type="hidden" name="userId" value="${MEMBER.userid }" />

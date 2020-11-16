@@ -21,7 +21,7 @@
 <!-- 	<bean id="profileImgView" class="kr.or.ddit.mvc.view.ProfileImgView"></bean> -->
 <!-- 	<bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"></bean> -->
 	
-	
+	<bean id="attchFileDownload" class="kr.or.ddit.file.controller.FileDownloadViewResolver"></bean>
 	<bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
 		<property name="order" value="1" />
 	</bean>

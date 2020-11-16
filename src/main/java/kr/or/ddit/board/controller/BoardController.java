@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -127,8 +128,7 @@ public class BoardController {
 	 * 게시판을 리스트 형태로 반환하는 메서드
 	 */
 	@RequestMapping("/boardList")
-	public String boardListView(HttpSession session, 
-								Model model,
+	public String boardListView(Model model,
 								int boardKindId,
 								@RequestParam(name = "pageNum", defaultValue = "1") String pageNumStr) {
 		
@@ -366,7 +366,8 @@ public class BoardController {
 								    String boardTitleName, 
 								    String editordata, 
 								    int BOARD_KIND_ID,
-								    @RequestParam(name = "delFileIdInfo") String[] delFileIdList) {
+								    @RequestParam(name = "delFileIdInfo", required = false) String[] delFileIdInfo,
+								    @RequestPart("file") List<MultipartFile> fileList) throws IllegalStateException, IOException {
 		
 		
 		MemberVO memVO = (MemberVO) session.getAttribute("MEMBER");
@@ -386,9 +387,9 @@ public class BoardController {
 		// board update
 		// 파일 리스트에서 삭제한것이 있는지 확인
 		List<Integer> fileIdList = null;
-		if(delFileIdList != null) {
+		if(delFileIdInfo != null && delFileIdInfo.length > 0) {
 			fileIdList = new ArrayList<Integer>();
-			for(String fileInfoId : delFileIdList) {
+			for(String fileInfoId : delFileIdInfo) {
 				int delFileId = Integer.parseInt(fileInfoId);
 				fileIdList.add(delFileId);
 			}
@@ -399,91 +400,61 @@ public class BoardController {
 		List<FileVO> insertFileList = null;
 		FileVO insertFileVO = null;
 		
-		/*
-		 // 파일을 추가했는지에 대한 여부 확인
-			List<FileVO> insertFileList = null;
-			FileVO insertFileVO = null;
-			Collection<Part> parts = request.getParts();
-			for(Part part : parts) {
+		
+		if(fileList.size() > 0) {
+			
+			for(MultipartFile file : fileList) {
 				
-				Part partTemp  = part;
-				String partName = partTemp.getName();
-				
-				String fileRealName = "";
-				
-				if(partName.equals("fileInput")) {
+				if(!file.getOriginalFilename().equals("")) {
+					logger.debug("fileName : {}", file.getOriginalFilename());
 					
-					String attchHeader = partTemp.getHeader("Content-disposition");
-					logger.debug("attchHeader : {}", attchHeader);
+					insertFileList = new ArrayList<FileVO>();
 					
-					String[] headerInfo = attchHeader.split("; ");
+					// 파일의 진짜 이름(이름 + 확장자)
+					String fileRealName = file.getOriginalFilename();
 					
-					for(String headerSplit : headerInfo) {
-						
-						String[] temp = headerSplit.split("=");
-						
-						if("filename".equals(temp[0])) {
-							
-							if(!"\"\"".equals(temp[1])) {
-								
-								fileRealName = temp[1].split("\"")[1];
-									
-								insertFileList = new ArrayList<FileVO>();
-								
-								// uuid
-								String tempName = UUID.randomUUID().toString();
-								
-								// file 확장자
-								String fileEx = FileUploadUtil.getExtension(fileRealName);
-								
-								// db에 저장할 파일의 경로와 파일의 이름 + 확장자
-								String filename = "D:\\upload\\" + tempName + "." + fileEx;
-								
-								// 파일 업로드
-								partTemp.write(filename);
-								partTemp.delete();
-								
-								// 파일경로를 db에 저장
-								insertFileVO = new FileVO();
-								insertFileVO.setFILE_NAME(filename);
-								insertFileVO.setREAL_FILE_NAME(fileRealName);
-								insertFileVO.setBOARD_KIND_ID(boardKindId);
-								insertFileVO.setBOARD_SEQ(boardSeq);
-								insertFileVO.setFILE_STATUS("Y");
-								
-								insertFileList.add(insertFileVO);
-							}
-							
-						}
-					}
+					// uuid
+					String tempName = UUID.randomUUID().toString();
+					
+					// file 확장자
+					String fileEx = FileUploadUtil.getExtension(fileRealName);
+					
+					// db에 저장할 파일의 경로와 파일의 이름 + 확장자
+					String filename = "D:\\upload\\" + tempName + "." + fileEx;
+					
+					
+					File insertFile = new File(filename);
+					
+					// 파일 업로드
+					file.transferTo(insertFile);
+					
+					
+					// 파일경로를 db에 저장
+					insertFileVO = new FileVO();
+					insertFileVO.setFILE_NAME(filename);
+					insertFileVO.setREAL_FILE_NAME(fileRealName);
+					insertFileVO.setBOARD_KIND_ID(BOARD_KIND_ID);
+					insertFileVO.setBOARD_SEQ(BOARD_SEQ);
+					insertFileVO.setFILE_STATUS("Y");
+					
+					insertFileList.add(insertFileVO);
 				}
-				logger.debug("fileName : {}", fileRealName);
 			}
-			
-			
-			
-			
-			
-			
-			
-			Map<String, Object> updateInfoMap = new HashMap<String, Object>();
-			updateInfoMap.put("boardVO", boardVO);
-			updateInfoMap.put("fileIdList", fileIdList);
-			updateInfoMap.put("insertFileList", insertFileList);
-			
-			int updateBoardCnt = boardService.updateBoardInfo(updateInfoMap);
-			
-			if(updateBoardCnt == 1) {
-				response.sendRedirect(request.getContextPath() + "/boardInfo?boardId=" + boardSeq);
-			}else {
-				doGet(request, response);
-			}
-		 
-		 */
+		}
 		
+		Map<String, Object> updateInfoMap = new HashMap<String, Object>();
+		updateInfoMap.put("boardVO", boardVO);
+		updateInfoMap.put("fileIdList", fileIdList);
+		updateInfoMap.put("insertFileList", insertFileList);
 		
-		
-		return "";
+		int updateBoardCnt = boardService.updateBoardInfo(updateInfoMap);
+		if(updateBoardCnt == 1) {
+			String redirectpath = "redirect:/board/boardInfo?boardSeq="+BOARD_SEQ;
+			return redirectpath;
+		}else {
+			String forwardPath = "redirect:/board/boardUpdateView?boardSeq="+BOARD_SEQ;
+			return forwardPath;
+		}
 	}
 	
 	
@@ -494,136 +465,24 @@ public class BoardController {
 	
 	
 	
-	/*
-		protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	@RequestMapping("/boardDelete")
+	public String boardDelete(int boardSeq, int boardKindId) {
 		
-			
-			
-			String[] delFileIdList = request.getParameterValues("delFileIdInfo");
-			
-			int boardSeq = Integer.parseInt(request.getParameter("BOARD_SEQ"));
-			String testboardSeq = request.getParameter("BOARD_SEQ");
-			String boardTitle = request.getParameter("boardTitleName");
-			
-			
-			
-			logger.debug("delFileIdList : {}", delFileIdList);
-			
-			
-			String editordata = request.getParameter("editordata");
-			int boardKindId = Integer.parseInt(request.getParameter("BOARD_KIND_ID"));
 		
-			logger.debug("editordata : {}", editordata);
-			
-			MemberVO memVO = (MemberVO)request.getSession().getAttribute("MEMBER");
-			
-			
-			BoardVO boardVO = new BoardVO();
-			boardVO.setBOARD_SEQ(boardSeq);
-			boardVO.setBOARD_TITLE(boardTitle);
-			boardVO.setBOARD_CONTENT(editordata);
-			boardVO.setUSERID(memVO.getUserid());
-			boardVO.setBOARD_KIND_ID(boardKindId);
-			boardVO.setBOARD_STATUS("Y");
-			
-			
-			
-			// board update
-			// 파일 리스트에서 삭제한것이 있는지 확인
-			List<Integer> fileIdList = null;
-			if(delFileIdList != null) {
-				fileIdList = new ArrayList<Integer>();
-				for(String fileInfoId : delFileIdList) {
-					int delFileId = Integer.parseInt(fileInfoId);
-					fileIdList.add(delFileId);
-				}
-			}
-			
-			
-			// 파일을 추가했는지에 대한 여부 확인
-			List<FileVO> insertFileList = null;
-			FileVO insertFileVO = null;
-			Collection<Part> parts = request.getParts();
-			for(Part part : parts) {
-				
-				Part partTemp  = part;
-				String partName = partTemp.getName();
-				
-				String fileRealName = "";
-				
-				if(partName.equals("fileInput")) {
-					
-					String attchHeader = partTemp.getHeader("Content-disposition");
-					logger.debug("attchHeader : {}", attchHeader);
-					
-					String[] headerInfo = attchHeader.split("; ");
-					
-					for(String headerSplit : headerInfo) {
-						
-						String[] temp = headerSplit.split("=");
-						
-						if("filename".equals(temp[0])) {
-							
-							if(!"\"\"".equals(temp[1])) {
-								
-								fileRealName = temp[1].split("\"")[1];
-									
-								insertFileList = new ArrayList<FileVO>();
-								
-								// uuid
-								String tempName = UUID.randomUUID().toString();
-								
-								// file 확장자
-								String fileEx = FileUploadUtil.getExtension(fileRealName);
-								
-								// db에 저장할 파일의 경로와 파일의 이름 + 확장자
-								String filename = "D:\\upload\\" + tempName + "." + fileEx;
-								
-								// 파일 업로드
-								partTemp.write(filename);
-								partTemp.delete();
-								
-								// 파일경로를 db에 저장
-								insertFileVO = new FileVO();
-								insertFileVO.setFILE_NAME(filename);
-								insertFileVO.setREAL_FILE_NAME(fileRealName);
-								insertFileVO.setBOARD_KIND_ID(boardKindId);
-								insertFileVO.setBOARD_SEQ(boardSeq);
-								insertFileVO.setFILE_STATUS("Y");
-								
-								insertFileList.add(insertFileVO);
-							}
-							
-						}
-					}
-				}
-				logger.debug("fileName : {}", fileRealName);
-			}
-			
-			
-			
-			
-			
-			
-			
-			Map<String, Object> updateInfoMap = new HashMap<String, Object>();
-			updateInfoMap.put("boardVO", boardVO);
-			updateInfoMap.put("fileIdList", fileIdList);
-			updateInfoMap.put("insertFileList", insertFileList);
-			
-			int updateBoardCnt = boardService.updateBoardInfo(updateInfoMap);
-			
-			if(updateBoardCnt == 1) {
-				response.sendRedirect(request.getContextPath() + "/boardInfo?boardId=" + boardSeq);
-			}else {
-				doGet(request, response);
-			}
-			
+		BoardVO boardVO = new BoardVO();
+		boardVO.setBOARD_SEQ(boardSeq);
+		boardVO.setBOARD_STATUS("N");
+		boardVO.setBOARD_TITLE("[삭제된 게시글 입니다.]");
+		int delBoardCnt = boardService.delBoardStatus(boardVO);
+		
+		if(delBoardCnt == 1) {
+			String delRedirectPath = "redirect:/board/boardList?boardKindId=" + boardKindId;
+			return delRedirectPath;
+		}else {
+			String infoRedirectPath = "redirect:/board/boardInfo?boardSeq=" + boardSeq;
+			return infoRedirectPath;
 		}
-	 */
-	
-	
-	
+	}
 	
 	
 	

@@ -75,8 +75,8 @@
 			$(document).on("click", ".delFileBtn", function(){
 				
 				var delFileId = $(this).parents(".dbFileDiv").find(".delFileId").val();
-// 				alert(delFileId);
 				deltagInfo = "<div><input type='hidden' name='delFileIdInfo' value='"+delFileId+"' /></div>";
+// 				alert(deltagInfo);
 				
 				$("#attachFileDiv #deletedFileIdIdiv").append(deltagInfo)
 				$(this).parents(".dbFileDiv").remove();

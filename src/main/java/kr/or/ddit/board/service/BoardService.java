@@ -177,7 +177,12 @@ public class BoardService implements BoardServiceI {
 				insertFileList = new ArrayList<FileVO>();
 			}
 		}
-		return updateResult;
+		
+//		if(updateFileInfoCnt == 1 && insertFileInfoCnt == 1) {
+//			updateResult = 1;
+//		}
+		
+		return updateBoardCnt;
 	}
 
 
