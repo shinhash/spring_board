@@ -164,6 +164,7 @@ public class BoardService implements BoardServiceI {
 					updateFileInfoCnt = boardDao.updateFileInfo(updateFileVO);
 				}
 			}else {
+				// else일 경우에도 테스트를 하자
 				delFileIdList = new ArrayList<Integer>();
 			}
 			

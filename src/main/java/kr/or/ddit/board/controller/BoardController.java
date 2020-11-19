@@ -182,12 +182,11 @@ public class BoardController {
 	 * 선택한 게시글 번호와 일치하는 게시글의 정보(게시글정보, 파일정보, 댓글정보)를 반환하는 메서드
 	 */
 	@RequestMapping("/boardInfo")
-	public String boardInfoView(int boardSeq, Model model) {
+	public String boardInfoView(String boardSeq, Model model) {
 		
-		BoardVO boardVO = boardService.selectBoardInfo(boardSeq);
-		List<FileVO> fileList = boardService.selectFileList(boardSeq);
+		BoardVO boardVO = boardService.selectBoardInfo(Integer.parseInt(boardSeq));
+		List<FileVO> fileList = boardService.selectFileList(Integer.parseInt(boardSeq));
 		List<RepleVO> repleList = repleService.selectRepleList(boardVO);
-		
 		
 		model.addAttribute("boardVO", boardVO);
 		model.addAttribute("fileList", fileList);
@@ -204,18 +203,15 @@ public class BoardController {
 	 * 게시글 작성 페이지 이동 메서드
 	 */
 	@RequestMapping("/registView")
-	public String boardRegistView(String boardPseq, int boardKindId, Model model) {
-		
-		
-		logger.debug("boardPseq : {}", boardPseq);
+	public String boardRegistView(String boardPseq, String boardKindId, Model model) {
 		
 		if(boardPseq == null) {
 			
-			model.addAttribute("boardKindId", boardKindId);
+			model.addAttribute("boardKindId", Integer.parseInt(boardKindId));
 		}else {
 			
 			model.addAttribute("boardPseq", boardPseq);
-			model.addAttribute("boardKindId", boardKindId);
+			model.addAttribute("boardKindId", Integer.parseInt(boardKindId));
 		}
 		
 		return "tiles/board/boardRegist";
@@ -236,21 +232,12 @@ public class BoardController {
 	public String registAction(HttpSession session, 
 							   String boardTitle, 
 							   String editordata, 
-							   int BOARD_KIND_ID,
+							   String BOARD_KIND_ID,
 							   @RequestParam(name = "boardPseq", defaultValue = "0") String boardPseq, 
 							   @RequestPart("file") List<MultipartFile> fileList
 							   ) throws IllegalStateException, IOException {
 		
-		
-		for(MultipartFile file : fileList) {
-			logger.debug("file : {}", file.getOriginalFilename());
-		}
-		
-		
-		
-		
 		MemberVO memVO = (MemberVO) session.getAttribute("MEMBER");
-		
 		
 		
 		// 다음번 번호 생성
@@ -262,7 +249,7 @@ public class BoardController {
 		boardVO.setBOARD_TITLE(boardTitle);
 		boardVO.setBOARD_CONTENT(editordata);
 		boardVO.setUSERID(memVO.getUserid());
-		boardVO.setBOARD_KIND_ID(BOARD_KIND_ID);
+		boardVO.setBOARD_KIND_ID(Integer.parseInt(BOARD_KIND_ID));
 		boardVO.setBOARD_STATUS("Y");
 
 		// 답글작성 ==> 부모글이 있는지 확인
@@ -320,7 +307,7 @@ public class BoardController {
 						fileVO = new FileVO();
 						fileVO.setFILE_NAME(filename);
 						fileVO.setREAL_FILE_NAME(fileRealName);
-						fileVO.setBOARD_KIND_ID(BOARD_KIND_ID);
+						fileVO.setBOARD_KIND_ID(Integer.parseInt(BOARD_KIND_ID));
 						fileVO.setBOARD_SEQ(boardSeq);
 						fileVO.setFILE_STATUS("Y");
 						
@@ -362,13 +349,10 @@ public class BoardController {
 	 * 게시글 수정 페이지 이동 메서드
 	 */
 	@RequestMapping("/boardUpdateView")
-	public String boardupdateView(int boardSeq, Model model) {
+	public String boardupdateView(String boardSeq, Model model) {
 		
-		BoardVO boardVO = boardService.selectBoardInfo(boardSeq);
-		fileList = boardService.selectFileList(boardSeq);
-		
-		
-		
+		BoardVO boardVO = boardService.selectBoardInfo(Integer.parseInt(boardSeq));
+		fileList = boardService.selectFileList(Integer.parseInt(boardSeq));
 		
 		if(fileList != null && fileList.size() > 0) {
 			model.addAttribute("fileList", fileList);			
@@ -388,15 +372,16 @@ public class BoardController {
 	
 	
 	
+	
 	/**
 	 * 게시글 수정 등록 메서드
 	 */
 	@RequestMapping(path="/boardUpdateAction", method = RequestMethod.POST)
 	public String boardUpdateAction(HttpSession session, 
-								    int BOARD_SEQ, 
+								    String BOARD_SEQ, 
 								    String boardTitleName, 
 								    String editordata, 
-								    int BOARD_KIND_ID,
+								    String BOARD_KIND_ID,
 								    @RequestParam(name = "delFileIdInfo", required = false) String[] delFileIdInfo,
 								    @RequestPart(name = "file", required = false) List<MultipartFile> fileList) throws IllegalStateException, IOException {
 		
@@ -411,11 +396,11 @@ public class BoardController {
 		
 		
 		BoardVO boardVO = new BoardVO();
-		boardVO.setBOARD_SEQ(BOARD_SEQ);
+		boardVO.setBOARD_SEQ(Integer.parseInt(BOARD_SEQ));
 		boardVO.setBOARD_TITLE(boardTitleName);
 		boardVO.setBOARD_CONTENT(editordata);
 		boardVO.setUSERID(memVO.getUserid());
-		boardVO.setBOARD_KIND_ID(BOARD_KIND_ID);
+		boardVO.setBOARD_KIND_ID(Integer.parseInt(BOARD_KIND_ID));
 		boardVO.setBOARD_STATUS("Y");
 		
 		
@@ -470,8 +455,8 @@ public class BoardController {
 					insertFileVO = new FileVO();
 					insertFileVO.setFILE_NAME(filename);
 					insertFileVO.setREAL_FILE_NAME(fileRealName);
-					insertFileVO.setBOARD_KIND_ID(BOARD_KIND_ID);
-					insertFileVO.setBOARD_SEQ(BOARD_SEQ);
+					insertFileVO.setBOARD_KIND_ID(Integer.parseInt(BOARD_KIND_ID));
+					insertFileVO.setBOARD_SEQ(Integer.parseInt(BOARD_SEQ));
 					insertFileVO.setFILE_STATUS("Y");
 					
 					insertFileList.add(insertFileVO);
@@ -510,11 +495,11 @@ public class BoardController {
 	 * 게시글 삭제 메서드
 	 */
 	@RequestMapping("/boardDelete")
-	public String boardDelete(int boardSeq, int boardKindId) {
+	public String boardDelete(String boardSeq, String boardKindId) {
 		
 		
 		BoardVO boardVO = new BoardVO();
-		boardVO.setBOARD_SEQ(boardSeq);
+		boardVO.setBOARD_SEQ(Integer.parseInt(boardSeq));
 		boardVO.setBOARD_STATUS("N");
 		boardVO.setBOARD_TITLE("[삭제된 게시글 입니다.]");
 		int delBoardCnt = boardService.delBoardStatus(boardVO);

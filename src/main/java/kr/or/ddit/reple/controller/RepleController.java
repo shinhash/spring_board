@@ -28,13 +28,13 @@ public class RepleController {
 	
 	
 	@RequestMapping("/regist")
-	public String repleRegist(HttpSession session, int boardSeq, int boardKindId, String repleContent) {
+	public String repleRegist(HttpSession session, String boardSeq, String boardKindId, String repleContent) {
 		
 		MemberVO member = (MemberVO) session.getAttribute("MEMBER");
 		
 		RepleVO repleVO = new RepleVO();
-		repleVO.setBOARD_SEQ(boardSeq);
-		repleVO.setBOARD_KIND_ID(boardKindId);
+		repleVO.setBOARD_SEQ(Integer.parseInt(boardSeq));
+		repleVO.setBOARD_KIND_ID(Integer.parseInt(boardKindId));
 		repleVO.setUSERID(member.getUserid());
 		repleVO.setREPLE_STATUS("Y");
 		repleVO.setREPLE_CONTENT(repleContent);
@@ -51,14 +51,13 @@ public class RepleController {
 	
 	
 	
-	
 	@RequestMapping("/delete")
-	public String repleDelete(int repleId) {
+	public String repleDelete(String repleId) {
 		
-		int delReple = repleService.deleteReple(repleId);
+		int delReple = repleService.deleteReple(Integer.parseInt(repleId));
 		
 		
-		int boardSeq = repleService.selectRepBoardId(repleId);
+		int boardSeq = repleService.selectRepBoardId(Integer.parseInt(repleId));
 		String path = "redirect:/board/boardInfo?boardSeq="+boardSeq;
 		return path;
 	}

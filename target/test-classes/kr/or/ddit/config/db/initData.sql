@@ -90,4 +90,21 @@ insert into BOARD_TABLE(BOARD_SEQ,
                         BOARD_RN) 
 values(0,'testTitle','testContent',0,'brown',sysdate,0,'Y',0);
 
+
+
+
+insert into REPLE_TABLE(BOARD_SEQ,
+						REPLE_SEQ,
+						REPLE_CONTENT,
+						REPLE_DT,
+						BOARD_KIND_ID,
+						REPLE_STATUS,
+						USERID)
+values(0,0,'repleTestContent',sysdate,0,'Y','brown');
+
+
+
+
 commit;
+
+

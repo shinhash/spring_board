@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+
+
+
+
+
+
+	<websocket:handlers allowed-origins="*" >
+        <websocket:mapping handler="handlerChat" path="/chatAction" />
+        <websocket:sockjs websocket-enabled="true" />
+    </websocket:handlers>
+    
+    <bean id="handlerChat" class="kr.or.ddit.socket.web.ChatHandler" />
+    
+    
+    
+	<!-- @Contoller, @RequestMapping,
+		 HandlerMapping, HandlerAdapter,
+		 formatting conversion service등 
+		 spring mvc 패턴에 필요한 어노테이션, 엘리먼트 치리 -->
+	<mvc:annotation-driven />
+	
+	
+	<!-- spring container가 처리하지 못하는 요청에 대해 
+		 server에 등록된 default servlet에게 위임 -->
+	<mvc:default-servlet-handler/>
+
+
+
+
+
+
+    
+    
+    
+    
+</beans>

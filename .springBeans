@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beansProjectDescription>
+	<version>1</version>
+	<pluginVersion><![CDATA[3.9.15.202010271126-CI-B2726]]></pluginVersion>
+	<configSuffixes>
+		<configSuffix><![CDATA[xml]]></configSuffix>
+	</configSuffixes>
+	<enableImports><![CDATA[false]]></enableImports>
+	<configs>
+	</configs>
+	<autoconfigs>
+		<config>src/main/resources/kr/or/ddit/config/spring/root-context.xml</config>
+		<config>src/test/resources/kr/or/ddit/config/spring/interceptor-context.xml</config>
+		<config>src/test/resources/kr/or/ddit/config/spring/datasource-context.xml</config>
+		<config>src/test/resources/kr/or/ddit/config/spring/transaction-context.xml</config>
+		<config>src/test/resources/kr/or/ddit/config/spring/aop-context.xml</config>
+		<config>src/main/resources/kr/or/ddit/config/spring/transaction-context.xml</config>
+		<config>src/test/resources/kr/or/ddit/config/spring/application-context.xml</config>
+		<config>src/main/resources/kr/or/ddit/config/spring/datasource-context.xml</config>
+		<config>src/main/resources/kr/or/ddit/config/spring/aop-context.xml</config>
+		<config>src/main/resources/kr/or/ddit/config/spring/application-context.xml</config>
+		<config>src/test/resources/kr/or/ddit/config/spring/root-context.xml</config>
+		<config>src/main/resources/kr/or/ddit/config/spring/interceptor-context.xml</config>
+	</autoconfigs>
+	<configSets>
+	</configSets>
+</beansProjectDescription>
